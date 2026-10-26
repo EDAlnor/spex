@@ -671,7 +671,10 @@ results <- future_lapply(1:n_sims, \(i) {
   # Conditional logit (fixed effects).
   # Start by creating a copy of the FE df for the worker.
   worker_fe <- main_data_fe |> 
-    mutate(y = rbinom(n = nrow_fe, size = 1L, p = probs_fe))
+    mutate(y = rbinom(n = nrow_fe, size = 1L, p = probs_fe)) |> 
+    group_by(gid, year) |> 
+    filter(n_distinct(y) > 1) |> 
+    ungroup()
   
   fit_s_fe <- clogit(
     y ~ spec_sum + type + strata(gid, year),
